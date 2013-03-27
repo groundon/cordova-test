@@ -1,0 +1,47 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>jsApi Test</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.css" />
+	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready (function() 
+        {
+            $("#label_title").html(document.title);
+        });
+    </script>
+</head> 
+<body> 
+
+<div data-role="page" id="index">
+    <div data-role="header" data-position="fixed">
+        <h1><label id="label_title"></label></h1>
+    </div><!-- /header --> 
+
+	<div data-role="content">	
+		<ul data-role="listview" data-inset="true">
+            <li><a href="accelerometer.html" data-ajax="false">Accelerometer</a></li>
+            <li><a href="camera.html" data-ajax="false">Camera</a></li>
+            <li><a href="capture.html" data-ajax="false">Capture</a></li>
+            <li><a href="compass.html" data-ajax="false">Compass</a></li>
+            <li><a href="connection.html" data-ajax="false">Connection</a></li>
+            <li><a href="contacts.html" data-ajax="false">Contacts</a></li>
+            <li><a href="device.html" data-ajax="false">Device</a></li>
+            <li><a href="events.html" data-ajax="false">Events</a></li>
+            <li><a href="file.html" data-ajax="false">File</a></li>
+            <li><a href="geolocation.html" data-ajax="false">Geolocation</a></li>
+            <li><a href="globalization.html" data-ajax="false">Globalization</a></li>
+            <li><a href="inappbrowser.html" data-ajax="false">InAppBrowser</a></li>
+            <li><a href="media.html" data-ajax="false">Media</a></li>
+            <li><a href="notification.html" data-ajax="false">Notification</a></li>
+            <li><a href="splashscreen.html" data-ajax="false">Splashscreen</a></li>
+            <li><a href="storage.html" data-ajax="false">Storage</a></li>
+        </ul>
+	</div><!-- /content -->
+
+</div><!-- /page -->
+
+</body>
+</html>

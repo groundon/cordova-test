@@ -1,0 +1,225 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>Storage</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.css" />
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	
+	<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova-2.5.0.js"></script>  
+    <script type="text/javascript">
+
+        var sqlNum = 4;
+		var hasExcuted = 0;
+		
+        $(document).ready (function() 
+        {
+			$("#label_title").text(document.title);
+			
+            $("#but_insertDB").click(function() { onclickInsertDB(); } );
+            $("#but_queryDB").click(function() { onclickQueryDB(); } );
+            $("#but_clearDB").click(function() { onclickClearDB(); } );
+			
+            $("#but_updateLocalStorage").click(function() { onclickUpdateLocalStorage(); } );
+            $("#but_getLocalStorage").click(function() { getLocalStorage(); } );
+            $("#but_clearLocalStorage").click(function() { window.localStorage.clear(); log2("clear local storage ok!"); } );
+
+            $("#but_insertDB").attr("disabled", true);
+            $("#but_queryDB").attr("disabled", true);
+            $("#but_clearDB").attr("disabled", true);
+            
+            $("#but_updateLocalStorage").attr("disabled", true);
+            $("#but_getLocalStorage").attr("disabled", true);
+            $("#but_clearLocalStorage").attr("disabled", true);
+
+            $("#but_insertDB").addClass("disabledButton");
+            $("#but_queryDB").addClass("disabledButton");
+            $("#but_clearDB").addClass("disabledButton");
+			
+            $("#but_updateLocalStorage").addClass("disabledButton");
+            $("#but_getLocalStorage").addClass("disabledButton");
+            $("#but_clearLocalStorage").addClass("disabledButton");
+			
+            document.addEventListener("deviceready", onDeviceReady, false);
+        });
+
+        function onDeviceReady()
+        {
+            $("#but_insertDB").attr("disabled", false);
+            $("#but_queryDB").attr("disabled", false);
+            $("#but_clearDB").attr("disabled", false);
+			
+            $("#but_insertDB").removeClass("disabledButton");
+            $("#but_queryDB").removeClass("disabledButton");
+            $("#but_clearDB").removeClass("disabledButton");
+			
+            $("#but_updateLocalStorage").attr("disabled", false);
+            $("#but_getLocalStorage").attr("disabled", false);
+            $("#but_clearLocalStorage").attr("disabled", false);            
+
+            $("#but_updateLocalStorage").removeClass("disabledButton");
+            $("#but_getLocalStorage").removeClass("disabledButton");
+            $("#but_clearLocalStorage").removeClass("disabledButton");		
+        }
+
+		function onclickInsertDB()
+		{
+			var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(populateDB, errorCB, insertSucess);
+		}
+
+        function onclickQueryDB() 
+        {
+            var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(queryDB, errorCB);
+        }
+		
+		function onclickClearDB()
+		{
+            var db = window.openDatabase("Database", "1.0", "Cordova Demo", 200000);
+            db.transaction(deleteDB, errorCB);			
+		}
+		
+        function populateDB(tx) 
+        {
+            tx.executeSql('DROP TABLE IF EXISTS DEMO');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS DEMO (id unique, data)');
+            tx.executeSql('INSERT INTO DEMO (id, data) VALUES (1, "First row")');
+            tx.executeSql('INSERT INTO DEMO (id, data) VALUES (2, "Second row")');
+        }
+
+        function queryDB(tx) 
+        {
+            tx.executeSql('SELECT * FROM DEMO', [], querySuccess, errorCB);
+        }
+
+		function deleteDB(tx)
+		{
+			tx.executeSql('DELETE FROM DEMO', [], deleteSuccess, errorCB);
+		}
+		
+		function insertSucess()
+		{
+			if (hasExcuted < sqlNum)
+				hasExcuted += 1;
+			else
+			{
+				log("Insert DB successfully. ");
+				hasExcuted = 0;
+			}
+		}		
+		
+        function querySuccess(tx, results) 
+        {
+            var len = results.rows.length;
+            log("DEMO table: " + len + " rows found.");
+            
+            for (var i=0; i<len; i++)
+            {
+               log("[" + i + "] (" + results.rows.item(i).id + ", " + results.rows.item(i).data + ")");
+            }
+        }
+
+		function deleteSuccess()
+		{
+			log("Clear DB Success");
+		}
+		
+		function errorCB(err) 
+        {
+            alert("Error processing SQL: "+err.code);
+        }
+
+        function log(str)
+        {  
+            var date = new Date();
+            var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+            var value = $("#div_log").html();
+            var status = "["+time+"] "+str;
+            $("#div_log").html(value + status +"<br />");
+        }
+        		
+		// -----------------------------------
+		// local storage
+		// -----------------------------------
+        function onclickUpdateLocalStorage()
+        {
+            var key = $("#text_key").val();
+            var value = $("#text_value").val();
+
+            window.localStorage.setItem(key, value);
+			
+			log2("update local storage ok!");
+        }
+
+        function getLocalStorage()
+        {
+            var date = new Date();
+            var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+
+			log2("Get from local storage...");
+			
+			for (var key in window.localStorage)
+			{
+				var value = window.localStorage.getItem(key);
+				log2("(" + key + ", " + value + ")");
+			}
+        }
+        
+		function log2(str)
+		{
+			var date = new Date();
+            var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+            var value = $("#div_kvList").html();
+            var status = "["+time+"] "+str;
+            $("#div_kvList").html(value + status +"<br />");
+		}
+    </script>
+</head>
+
+<body>
+<div data-role="page" id="storage">
+    <div data-role="header" data-position="fixed">
+        <a href="#" data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Back</a>
+        <h1><label id="label_title"></label></h1>
+    </div><!-- /header --> 
+    
+    <div data-role="content">
+		<input type="button" id="but_insertDB" value="Insert DB" />
+		<input type="button" id="but_queryDB" value="Query DB" />
+		<input type="button" id="but_clearDB" value="Clear DB" />
+        <label for="textarea_log">Database Operation Log</label>
+        <div id="div_log"></div>
+        
+        <br /><br />
+        <fieldset>
+            <legend>W3C local storage</legend>        
+            <div class="ui-grid-a">
+                <div class="ui-block-a" style="width:20%;"><label for="text_key">Key</label></div>
+                <div class="ui-block-b" style="width:80%;">
+                    <input type="text" id="text_key" value="k1" />
+                </div>
+            </div>
+            <div class="ui-grid-a">
+                <div class="ui-block-a" style="width:20%;"><label for="text_value">Value</label></div>
+                <div class="ui-block-b" style="width:80%;">
+                    <input type="text" id="text_value" value="v1" />
+                </div>
+            </div>
+
+        </fieldset>
+
+        <input type="button" id="but_updateLocalStorage" value="Update Local Storage" />
+        <input type="button" id="but_getLocalStorage" value="Get Local Storage" />
+		<input type="button" id="but_clearLocalStorage" value="Clear Local Storage" />
+		
+        <label for="div_kvList">Local Storage Log</label>
+        <div id="div_kvList"></div>
+
+    </div><!-- /content -->
+</div> <!-- page -->        
+</body>
+    
+</html>

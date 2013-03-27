@@ -1,0 +1,268 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>Events</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.css" />
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	
+	<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova-2.5.0.js"></script>
+    <script type="text/javascript">
+
+		var CODE = 
+		{
+			CORDOVA:{RESUME:1, PAUSE:2, ONLINE:4, OFFLINE:8, END:16},
+			BATTERY:{CRITICAL:16, LOW:32, STATUS:64, END:128}
+		};
+
+		var currentStatus = 0;
+				
+        $(document).ready (function() 
+        {
+			$("#label_title").text(document.title);
+            document.addEventListener("deviceready", onDeviceReady, false);
+        });
+
+        function onDeviceReady() 
+        {
+            log("device is ready");
+            
+            $("#slider_back").change(function () {onchangeSlider("back");});
+            $("#slider_menu").change(function () {onchangeSlider("menu");});
+            $("#slider_search").change(function () {onchangeSlider("search");});
+			
+			mainLoop();
+
+            /*
+            $("#slider_startcall").change(function () {onchangeSlider("startcall");});
+            $("#slider_stopcall").change(function () {onchangeSlider("stopcall");});
+            $("#slider_endcall").change(function () {onchangeSlider("endcall");});
+            $("#slider_volumndown").change(function () {onchangeSlider("volumndown");});
+            $("#slider_volumnup").change(function () {onchangeSlider("volumnup");});
+            */
+        }
+        
+        function mainLoop()
+        {
+			if (!(currentStatus == (CODE.BATTERY.END-1)))
+				setTimeout("mainLoop();", 20);
+			else
+				alert("all events are registered");			
+			
+			if (currentStatus < (CODE.CORDOVA.END-1))
+			{	
+				if (!(currentStatus & CODE.CORDOVA.RESUME))
+				{
+					currentStatus += CODE.CORDOVA.RESUME;
+					document.addEventListener("resume", log("resume"), false);
+				}
+				if (!(currentStatus & CODE.CORDOVA.PAUSE))
+				{
+					currentStatus += CODE.CORDOVA.PAUSE;
+					document.addEventListener("pause", log("pause"), false);
+				}
+				if (!(currentStatus & CODE.CORDOVA.ONLINE))	
+				{
+					currentStatus += CODE.CORDOVA.ONLINE;
+					document.addEventListener("online", log("online"), false);
+				}
+				if (!(currentStatus & CODE.CORDOVA.OFFLINE))
+				{
+					currentStatus += CODE.CORDOVA.OFFLINE;
+					document.addEventListener("offline", log("offline"), false);
+				}
+			}
+			else if (currentStatus < (CODE.BATTERY.END-1))
+			{
+				if (!(currentStatus & CODE.BATTERY.CRITICAL))
+				{
+					currentStatus += CODE.BATTERY.CRITICAL;
+					window.addEventListener("batterycritical", log("batterycritical"), false);
+				}
+				if (!(currentStatus & CODE.BATTERY.LOW))
+				{
+					currentStatus += CODE.BATTERY.LOW;
+					window.addEventListener("batterylow", log("batterylow"), false);
+				}
+				if (!(currentStatus & CODE.BATTERY.STATUS))
+				{
+					currentStatus += CODE.BATTERY.STATUS;
+					window.addEventListener("batterystatus", onBatteryStatus, false);
+				}
+			}
+        }
+        
+        function getTime()
+        {
+            var myDate = new Date();
+            return myDate.getHours() + ":" + myDate.getMinutes() + ":" + myDate.getSeconds();
+        }
+        
+        function log(status) 
+        {
+            status = "[" + getTime() + "] " + status;
+            value = $("#div_log").html();
+            $("#div_log").html(value + status+"<br />");
+        }
+        
+        function onBatteryStatus(info) 
+        {
+            log("Battery level: " + info.level + ", isplugged: " + info.isPlugged); 
+        }
+        
+		function onBackKeyDown()
+		{
+			log("Back key is pressed");
+		}
+		function onMenuKeyDown()
+		{
+			log("Menu key is pressed");
+		}
+		function onSearchKeyDown()
+		{
+			log("Search key is pressed");
+		}
+		
+        function onchangeSlider(id)
+        {   
+            var status = $("#slider_"+id).val(); 
+            var event = id + "button";
+            
+            if (status == "on")
+			{
+				switch(event)
+				{
+					case "backbutton":
+						document.addEventListener(event, onBackKeyDown, false);
+						break;
+					case "menubutton":
+						document.addEventListener(event, onMenuKeyDown, false);
+						break;
+					case "searchbutton":
+						document.addEventListener(event, onSearchKeyDown, false);
+						break;
+				}
+			}
+            else if (status == "off")
+			{
+				switch(event)
+				{
+					case "backbutton":
+						document.removeEventListener("backbutton", onBackKeyDown, false);
+						log("Back key is removed");
+						break;
+					case "menubutton":
+						document.removeEventListener(event, onMenuKeyDown, false);
+						log("Menu key is removed");
+						break;
+					case "searchbutton":
+						document.removeEventListener(event, onSearchKeyDown, false);						
+						log("Search key is removed");
+						break;
+				}
+			}
+        }
+
+    </script>
+</head>
+
+<body>
+<div data-role="page" id="events">
+    <div data-role="header"  data-position="fixed">
+        <a href="#" data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Back</a>
+        <h1><label id="label_title"></label></h1>
+    </div><!-- /header --> 
+    
+    <div data-role="content">
+        <div class="ui-grid-b">
+            <div class="ui-block-a">
+                <div data-role="fieldcontain">
+                    <label for="slider">Back</label>
+                    <select name="slider" id="slider_back" data-role="slider">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>            
+            </div>
+            <div class="ui-block-b">
+                <div data-role="fieldcontain">
+                    <label for="slider">Menu</label>
+                    <select name="slider" id="slider_menu" data-role="slider">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>            
+            </div> 
+            <div class="ui-block-c">
+                <div data-role="fieldcontain">
+                    <label for="slider">Search</label>
+                    <select name="slider" id="slider_search" data-role="slider">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>            
+            </div>   
+			<!--
+            <div class="ui-block-d">
+                <div data-role="fieldcontain">
+                    <label for="slider">StartCall</label>
+                    <select name="slider" id="slider_startcall" data-role="slider">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>            
+            </div> 
+			-->
+        </div>
+		
+		<!--
+        <div class="ui-grid-c">
+            <div class="ui-block-a">
+                <div data-role="fieldcontain">
+                    <label for="slider">StopCall</label>
+                    <select name="slider" id="slider_stopcall" data-role="slider">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>            
+            </div>
+            <div class="ui-block-b">
+                <div data-role="fieldcontain">
+                    <label for="slider">EndCall</label>
+                    <select name="slider" id="slider_endcall" data-role="slider">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>            
+            </div> 
+            <div class="ui-block-c">
+                <div data-role="fieldcontain">
+                    <label for="slider">VolumnDown</label>
+                    <select name="slider" id="slider_volumndown" data-role="slider">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>            
+            </div>   
+            <div class="ui-block-d">
+                <div data-role="fieldcontain">
+                    <label for="slider">VolumnUp</label>
+                    <select name="slider" id="slider_volumnup" data-role="slider">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>            
+            </div> 
+        </div>
+        -->
+        <div data-role="fieldcontain">
+            <label for="div_log">Log:</label>
+            <div id="div_log"></div>
+        </div>
+    </div><!-- /content -->
+</div> <!-- page -->        
+</body>
+    
+</html>

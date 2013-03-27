@@ -1,0 +1,16 @@
+Accelerometer	ok	ok
+Camera		ok	ok
+Capture		ok	ok	
+Compass		ok	ok
+Connection	ok	ok
+Contacts	ok	ok
+Device		ok	ok
+Events		ok	ok
+File		ok	ok
+Geolocation	ok
+Globalization	ok	ok
+InAppBrowser	ok	ok
+Media		ok	ok
+Notification	ok	ok
+Splashscreen	ok	x
+Storage		ok	ok

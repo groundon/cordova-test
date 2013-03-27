@@ -1,0 +1,79 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>Capture</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.css" />
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	
+	<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova-2.5.0.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready (function() 
+        {
+			$("#label_title").text(document.title);
+			
+            $("#but_capture").attr("disabled", true);
+			$("#but_capture").addClass("disabledButton");
+            $("#but_capture").click(function() {onclickCapture(); } );
+			
+			document.addEventListener("deviceready", onDeviceReady, false);
+        });
+
+        function onDeviceReady()
+        {
+            $("#but_capture").attr("disabled", false);
+			$("#but_capture").removeClass("disabledButton");
+        }
+        
+        function captureSuccess(mediaFiles) 
+        {
+            var i, path, len;
+            var value;
+            
+            for (i = 0, len = mediaFiles.length; i < len; i += 1) 
+            {
+                path = mediaFiles[i].fullPath;
+                
+                value = $("#div_log").html();
+                $("#div_log").html(value+path+"\n");
+            }
+        }
+
+        function captureError(error) 
+        {
+            navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+			/*
+			CaptureError.CAPTURE_INTERNAL_ERR: Camera or microphone failed to capture image or sound.
+			CaptureError.CAPTURE_APPLICATION_BUSY: Camera application or audio capture application is currently serving other capture request.
+			CaptureError.CAPTURE_INVALID_ARGUMENT: Invalid use of the API (e.g. limit parameter has value less than one).
+			CaptureError.CAPTURE_NO_MEDIA_FILES: User exited camera application or audio capture application before capturing anything.
+			CaptureError.CAPTURE_NOT_SUPPORTED: The requested capture operation is not supported.
+			*/			
+        }
+
+        function onclickCapture()
+        {
+            navigator.device.capture.captureVideo(captureSuccess, captureError, {limit:2});
+        }
+
+    </script>
+</head>
+
+<body>
+<div data-role="page" id="capture">
+    <div data-role="header" data-position="fixed">
+        <a href="#" data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Back</a>
+        <h1><label id="label_title"></label></h1>
+    </div><!-- /header --> 
+    
+    <div data-role="content">
+        <input type="button" id="but_capture" value="Capture Video" />
+        <div id="div_log"></div>
+    </div><!-- /content -->
+</div> <!-- page -->        
+</body>
+    
+</html>

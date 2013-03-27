@@ -1,0 +1,120 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>Camera</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.css" />
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	
+	<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova-2.5.0.js"></script>
+    <script type="text/javascript">
+
+        var pictureSource;   // picture source
+        var destinationType; // sets the format of returned value 
+    
+        $(document).ready (function() 
+        {
+			$("#label_title").text(document.title);
+
+			$("#but_capturePhoto").attr("disabled", true);
+			$("#but_captureEditPhoto").attr("disabled", true);
+			$("#but_fromLibrary").attr("disabled", true);
+			$("#but_fromAlbum").attr("disabled", true);
+		
+			$("#but_capturePhoto").addClass("disabledButton");
+			$("#but_captureEditPhoto").addClass("disabledButton");
+			$("#but_fromLibrary").addClass("disabledButton");
+			$("#but_fromAlbum").addClass("disabledButton");	
+
+			document.addEventListener("deviceready", onDeviceReady, false);			
+        });
+
+        function onDeviceReady() 
+        {		
+			$("#but_capturePhoto").attr("disabled", false);
+			$("#but_captureEditPhoto").attr("disabled", false);
+			$("#but_fromLibrary").attr("disabled", false);
+			$("#but_fromAlbum").attr("disabled", false);
+			
+			$("#but_capturePhoto").removeClass("disabledButton");
+			$("#but_captureEditPhoto").removeClass("disabledButton");
+			$("#but_fromLibrary").removeClass("disabledButton");
+			$("#but_fromAlbum").removeClass("disabledButton");
+			
+            pictureSource = navigator.camera.PictureSourceType;
+            destinationType = navigator.camera.DestinationType;
+        }
+
+        function onPhotoDataSuccess(imageData) 
+        {
+            var smallImage = document.getElementById('smallImage');
+
+            // Unhide image elements
+            smallImage.style.display = 'block';
+            smallImage.src = "data:image/jpeg;base64," + imageData;
+        }
+
+        function onPhotoURISuccess(imageURI) 
+        {
+            var largeImage = document.getElementById('largeImage');
+
+            // Unhide image elements
+            largeImage.style.display = 'block';
+
+            // Show the captured photo
+            // The inline CSS rules are used to resize the image
+            largeImage.src = imageURI;
+        }
+
+        function capturePhoto() 
+        {
+            // Take picture using device camera and retrieve image as base64-encoded string
+            navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50,
+            destinationType: destinationType.DATA_URL });
+        }
+
+        function capturePhotoEdit() 
+        {
+            // Take picture using device camera, allow edit, and retrieve image as base64-encoded string  
+            navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 20, allowEdit: true,
+            destinationType: destinationType.DATA_URL });
+        }
+
+        function getPhoto(source) 
+        {
+            // Retrieve image file location from specified source
+            navigator.camera.getPicture(onPhotoURISuccess, onFail, 
+            {   quality: 50, 
+                destinationType: destinationType.FILE_URI,
+                sourceType: source });
+        }
+
+        function onFail(message) 
+        {
+            alert('Failed because: ' + message);
+        }        
+        
+    </script>
+</head>
+
+<body>
+<div data-role="page" id="camera">
+    <div data-role="header" data-position="fixed">
+        <a href="#" data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Back</a>
+        <h1><label id="label_title"></label></h1>
+    </div><!-- /header --> 
+    
+    <div data-role="content">
+		<input type="button" id="but_capturePhoto" onclick="capturePhoto();" value="Capture Photo" />
+        <input type="button" id="but_captureEditPhoto" onclick="capturePhotoEdit();" value="Capture Editable Photo" />
+        <input type="button" id="but_fromLibrary" onclick="getPhoto(pictureSource.PHOTOLIBRARY);" value="From Photo Library" />
+		<input type="button" id="but_fromAlbum" onclick="getPhoto(pictureSource.SAVEDPHOTOALBUM);" value="From Photo Album" />
+        <img style="display:none;width:60px;height:60px;" id="smallImage" src="" />
+        <img style="display:none;" id="largeImage" src="" />        
+    </div><!-- /content -->
+</div> <!-- page -->        
+</body>
+    
+</html>

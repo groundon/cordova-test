@@ -1,0 +1,151 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>Contacts</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.css" />
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	
+	<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/mobile/1.3.0-beta.1/jquery.mobile-1.3.0-beta.1.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova-2.5.0.js"></script>  
+    <script type="text/javascript">
+
+        $(document).ready (function() 
+        {
+			$("#label_title").text(document.title);
+            
+            $("#but_createContact").click(function() {onclickCreateContact();});
+            $("#but_findContact").click(function() {onclickFindContact();});
+            
+            $("#but_createContact").attr("disabled", true);
+            $("#but_findContact").attr("disabled", true);
+			
+            $("#but_createContact").addClass("disabledButton");
+            $("#but_findContact").addClass("disabledButton");
+			
+			document.addEventListener("deviceready", onDeviceReady, false);
+        });
+
+        function onDeviceReady()
+        {
+            $("#but_createContact").attr("disabled", false);
+            $("#but_findContact").attr("disabled", false);
+			
+            $("#but_createContact").removeClass("disabledButton");
+            $("#but_findContact").removeClass("disabledButton");			
+        }
+        
+        function onclickCreateContact()
+        {            
+            var contact = navigator.contacts.create();
+
+            var name = new ContactName();
+            name.givenName = $("#text_givenname").val();
+            name.familyName = $("#text_familyname").val();
+            contact.name = name;
+
+            var phoneNumbers = [];
+            //phoneNumbers[0] = new ContactField('work', '212-555-1234', false);
+            phoneNumbers[0] = new ContactField('mobile', $("#text_mobilephone").val(), true); // preferred number
+            //phoneNumbers[2] = new ContactField('home', '203-555-7890', false);
+            contact.phoneNumbers = phoneNumbers;
+
+            // save to device
+            contact.save(createSuccess, onError);
+        }
+        
+        function onclickFindContact()
+        {
+            var options = new ContactFindOptions();
+            options.filter = $("#text_find").val();
+            options.multiple = true; 
+			var fields = ["displayName", "name", "phoneNumbers"];
+            
+            navigator.contacts.find(fields, findSuccess, onError, options);            
+        }
+        
+		function findSuccess(contacts)
+		{
+			switch(contacts.length)
+			{
+				case 0:
+					log("no contact is found");
+					break;
+				case 1:
+					log(contacts.length + " contact is found");
+					break;
+				default:
+					log(contacts.length + " contacts are found");
+					break;
+			}
+
+			for (var i = 0; i < contacts.length; i++)
+			{
+				log("["+i+"] "+ contacts[i].name.givenName + " " + contacts[i].name.familyName);
+
+                if (contacts[i].phoneNumbers)
+                {
+                    for (var j = 0; j < contacts[i].phoneNumbers.length; j++) 
+                    {
+                        log("(" + contacts[i].phoneNumbers[j].type + ") " + contacts[i].phoneNumbers[j].value + "<br />");
+                    }
+                }
+			}
+		}
+        function createSuccess(contact) 
+        {
+            alert("Create " + contact.name.givenName + " successfully!");
+        };
+
+        function onError(contactError) 
+        {
+            alert("Contact error = " + contactError.code);
+        };
+
+		function log(str)
+		{	
+			var value = $("#div_contact").html();
+			$("#div_contact").html(value + str + "<br />");
+		}
+    </script>
+</head>
+
+<body>
+<div data-role="page" id="createContact">
+    <div data-role="header" data-position="fixed">
+        <a href="#" data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Back</a>
+        <h1><label id="label_title"></label></h1>
+    </div><!-- /header --> 
+
+    <div data-role="content">
+        <fieldset class="ui-grid-c">
+            <div class="ui-block-a" style="width:20%; text-align: center;"><label for="text_givenname">Given Name</label></div>
+            <div class="ui-block-b" style="width:80%"><input type="text" id="text_givenname" value="John" /></div>
+            <div class="ui-block-c" style="width:20%; text-align: center;"><label for="text_familyname">Family Name</label></div>
+            <div class="ui-block-d" style="width:80%"><input type="text" id="text_familyname" value="Doe" /></div>   
+        </fieldset>
+
+        <fieldset class="ui-grid-a">
+            <div class="ui-block-a" style="width:20%; text-align: center;"><label for="text_mobilephone">Mobile Phone</label></div>
+            <div class="ui-block-b" style="width:80%"><input type="tel" id="text_mobilephone" value="0911234567" /></div>
+        </fieldset>
+        
+        <input type="button" id="but_createContact" value="createContact" />
+        
+        <br /><br /><br />
+        
+		<label for="text_find">Find Contact</label>
+		<input type="text" id="text_find" value="John" />
+        <input type="button" id="but_findContact" value="findContact" />
+        <div data-role="fieldcontain">
+            <label for="div_contact">---Contact List---</label>
+            <div id="div_contact"></div>
+        </div>
+        
+    </div><!-- /content -->
+</div> <!-- page -->
+
+
+</body>   
+</html>
