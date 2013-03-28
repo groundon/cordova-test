@@ -53,6 +53,6 @@
         echo "Uploaded file extension: ".$extension."<br />";
         
         echo "Page would be redirected in 2 seconds. <br />";
-        header('Refresh: 2; url=http://172.22.41.63/Pigeon/MA/00_Temp/phonegapAPI/fileUpload.html'); 
+        header('Refresh: 2; url=http://CordovaAPI4.pigeonaws.tk/Pigeon/MA/00_Temp/phonegapAPI/fileUpload.html'); 
     }
 ?>
